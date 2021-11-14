@@ -80,11 +80,11 @@ def deserialize_private_key(path='private_key.pem'):
 
 def encrypt_symmetric_key(key, public_key):
     encrypted_key = public_key.encrypt(key, padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                                                             algorithm=hashes.SHA256(), label=None))
+                                                         algorithm=hashes.SHA256(), label=None))
     return encrypted_key
 
 
 def decrypt_symmetric_key(encrypted_key, private_key):
     decrypted_key = private_key.decrypt(encrypted_key, padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                                                                        algorithm=hashes.SHA256(), label=None))
+                                                                    algorithm=hashes.SHA256(), label=None))
     return decrypted_key

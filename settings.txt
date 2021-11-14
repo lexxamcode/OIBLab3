@@ -1,0 +1,7 @@
+'key_size': 128
+'initial_file': 'work_files/data/text_for_test.txt'
+'encrypted_file': 'work_files/data/encrypted_file.txt'
+'decrypted_file': 'work_files/data/decrypted_file.txt'
+'symmetric_key': 'work_files/keys/symmetric_key.txt'
+'public_key': 'work_files/keys/public_key.pem'
+'secret_key': 'work_files/keys/secret_key.pem'
