@@ -99,7 +99,7 @@ if __name__ == '__main__':
                 key, value = line.split(': ')
                 settings[key] = value
     else:
-        with open('work_files/settings.txt', 'r') as settings_file:
+        with open('settings.txt', 'r') as settings_file:
             for line in settings_file:
                 key, value = line.split(': ')
                 settings[key] = value
