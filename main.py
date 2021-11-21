@@ -3,14 +3,14 @@ import cryptosystem
 import argparse
 
 
-def keys_generator(block_size=128, path_public: str = 'public.pem', path_private: str = 'private.pem',
+def keys_generator(path_public: str = 'public.pem', path_private: str = 'private.pem',
                    path_symm: str = 'symmetric_key.txt') -> None:
     # Generating asymmetric keys:
     keys = cryptosystem.generate_asymmetric_keys()
     public_key = keys.public_key()
     private_key = keys
     # Generating and encrypting symmetric key:
-    symmetric_key = cryptosystem.encrypt_symmetric_key(cryptosystem.generate_symmetric_key(block_size // 8), public_key)
+    symmetric_key = cryptosystem.encrypt_symmetric_key(cryptosystem.generate_symmetric_key(256 // 8), public_key)
 
     # Serializing keys:
     cryptosystem.serialize_symmetric_key(symmetric_key, path_symm)
@@ -40,7 +40,7 @@ def encrypt_data(path_initial: str = 'initial_file.txt',
     # Decrypting symmetric key:
     symmetric_key = cryptosystem.decrypt_symmetric_key(symmetric_key, private_key)
     # Encrypting text:
-    encrypted_text = cryptosystem.encrypt_text_with_symmetric_algorithm(symmetric_key, initial_text.decode('UTF-8'))
+    encrypted_text = cryptosystem.encrypt_text_with_symmetric_algorithm(symmetric_key, initial_text.decode('windows-1251'))
     # Saving encrypted text and initial vector to file:
     with open(path_encrypted_text, 'wb') as enc_file:
         pickle.dump(encrypted_text, enc_file)
@@ -62,13 +62,12 @@ def decrypt_data(path_encrypted_text: str = 'encrypted.txt', path_private: str =
         encoded_text = pickle.load(encrypt_file)
 
     decrypted_text = cryptosystem.decrypt_text_symmetric_algorithm(encoded_text['ciphrotext'],
-                                                                   symmetric_key, encoded_text['iv'])
+                                                                   symmetric_key, encoded_text['nonce'])
     with open(path_decrypted, 'w') as dec:
         dec.write(decrypted_text.decode('UTF-8'))
 
 
 settings = {
-    'key_size': 128,
     'initial_file': 'work_files/data/text_for_test.txt',
     'encrypted_file': 'work_files/data/encrypted_file.txt',
     'decrypted_file': 'work_files/data/decrypted_file.txt',
@@ -78,7 +77,7 @@ settings = {
 }
 
 
-cryptosystem_parser = argparse.ArgumentParser(description="Camelia hybrid cryptosystem")
+cryptosystem_parser = argparse.ArgumentParser(description="ChaCha20 hybrid cryptosystem")
 cryptosystem_parser.add_argument('-s', '--settings', type=str, help="Path to the settings of cryptosystem. Check "
                                                                     "settings.txt in project directory for changing "
                                                                     "parameters.")
@@ -104,17 +103,15 @@ if __name__ == '__main__':
                 key, value = line.split(': ')
                 settings[key] = value
     # Key generation
-    if (int(settings['key_size']) == 128) or (int(settings['key_size']) == 192) or (int(settings['key_size']) == 256):
-        if args.generation is not None:
-            if args.generation == 'do':
-                keys_generator(settings['key_size'], settings['public_key'], settings['secret_key'],
-                               settings['symmetric_key'])
-            elif args.generation == 'null':
-                print('Key generation - skipped...')
-            else:
-                print('Incorrect command at pos2')
-    else:
-        print('Incorrect key size')
+    if args.generation is not None:
+        if args.generation == 'do':
+            keys_generator(settings['public_key'], settings['secret_key'],
+                           settings['symmetric_key'])
+        elif args.generation == 'null':
+            print('Key generation - skipped...')
+        else:
+            print('Incorrect command at pos2')
+
     # Encryption
     if args.encryption is not None:
         if args.encryption == 'do':

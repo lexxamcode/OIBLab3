@@ -34,26 +34,25 @@ def padding_text(text: str):
 
 
 def encrypt_text_with_symmetric_algorithm(key, text: str):
-    iv = os.urandom(16)
-    cipher = Cipher(algorithms.Camellia(key), modes.CBC(iv))
+    nonce = os.urandom(16)
+    algorithm = algorithms.ChaCha20(key, nonce)
+    cipher = Cipher(algorithm, mode=None)
     encryptor = cipher.encryptor()
-    e_text = encryptor.update(padding_text(text)) + encryptor.finalize()
 
-    set_for_decryption = {'ciphrotext': e_text, 'iv': iv}
+    e_text = encryptor.update(bytes(text, 'utf-8'))
+    set_for_decryption = {'ciphrotext': e_text, 'nonce': nonce}
 
     return set_for_decryption
 
 
-def decrypt_text_symmetric_algorithm(encrypted_text, key, iv):
-    cipher = Cipher(algorithms.Camellia(key), modes.CBC(iv))
+def decrypt_text_symmetric_algorithm(encrypted_text, key, nonce):
+    algorithm = algorithms.ChaCha20(key, nonce)
+    cipher = Cipher(algorithm, mode=None)
 
     decryptor = cipher.decryptor()
-    decrypted_text = decryptor.update(encrypted_text) + decryptor.finalize()
+    decrypted_text = decryptor.update(encrypted_text)
 
-    unpadder = pad.ANSIX923(128).unpadder()
-    unpadded_decrypted_text = unpadder.update(decrypted_text) + unpadder.finalize()
-
-    return unpadded_decrypted_text
+    return decrypted_text
 
 
 def generate_asymmetric_keys():
