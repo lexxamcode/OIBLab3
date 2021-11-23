@@ -1,6 +1,7 @@
 import pickle
 import cryptosystem
 import argparse
+import json
 
 
 def keys_generator(path_public: str = 'public.pem', path_private: str = 'private.pem',
@@ -68,12 +69,7 @@ def decrypt_data(path_encrypted_text: str = 'encrypted.txt', path_private: str =
 
 
 settings = {
-    'initial_file': 'work_files/data/text_for_test.txt',
-    'encrypted_file': 'work_files/data/encrypted_file.txt',
-    'decrypted_file': 'work_files/data/decrypted_file.txt',
-    'symmetric_key': 'work_files/keys/symmetric_key.txt',
-    'public_key': 'work_files/keys/public_key.pem',
-    'secret_key': 'work_files/keys/secret_key.pem',
+
 }
 
 
@@ -93,15 +89,17 @@ if __name__ == '__main__':
     args = cryptosystem_parser.parse_args()
     # Settings
     if args.settings is not None:
-        with open(args.settings, 'r') as settings_file:
+        with open(args.settings) as settings_file:
             for line in settings_file:
-                key, value = line.split(': ')
+                key, value = line.rstrip("\n").split(": ")
                 settings[key] = value
     else:
-        with open('settings.txt', 'r') as settings_file:
+        with open('settings.txt') as settings_file:
             for line in settings_file:
-                key, value = line.split(': ')
+                key, value = line.rstrip("\n").split(": ")
                 settings[key] = value
+
+    print(settings)
     # Key generation
     if args.generation is not None:
         if args.generation == 'do':
